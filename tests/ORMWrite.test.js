@@ -9,17 +9,19 @@ import { Controller } from '@lionrockjs/mvc';
 import { Central, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 import { ORMAdapterSQLite } from '@lionrockjs/adapter-database-better-sqlite3';
 
-Central.classPath.set('model/ModelChild.mjs', path.normalize(`${__dirname}/classes/ModelChild.js`));
-Central.classPath.set('model/ModelParent.mjs', path.normalize(`${__dirname}/classes/ModelParent.js`));
-Central.classPath.set('helper/Form.mjs', path.normalize(`${__dirname}/../classes/helper/Form.js`));
+import ControllerMixinORMInput from '../classes/controller-mixin/ORMInput';
+import ControllerMixinORMWrite from '../classes/controller-mixin/ORMWrite';
 
 import Person from './classes/model/Person.mjs';
 import User from './classes/model/User.mjs';
-
 import Product from './classes/Product.mjs';
 import Media from './classes/Media.mjs';
 import ModelTest from './classes/ModelTest.mjs';
 import ModelChild from './classes/ModelChild.mjs';
+
+Central.classPath.set('model/ModelChild.mjs', path.normalize(`${__dirname}/classes/ModelChild.mjs`));
+Central.classPath.set('model/ModelParent.mjs', path.normalize(`${__dirname}/classes/ModelParent.mjs`));
+Central.classPath.set('helper/Form.mjs', path.normalize(`${__dirname}/../classes/helper/Form.mjs`));
 
 Central.classPath.set('model/Product.mjs', Product);
 Central.classPath.set('model/Media.mjs', Media);
@@ -28,9 +30,6 @@ Central.classPath.set('model/ModelTest.mjs', ModelTest);
 Central.classPath.set('model/User.mjs', User);
 Central.classPath.set('model/ModelChild.mjs', ModelChild);
 ORM.defaultAdapter = ORMAdapterSQLite;
-
-import ControllerMixinORMInput from '../classes/controller-mixin/ORMInput';
-import ControllerMixinORMWrite from '../classes/controller-mixin/ORMWrite';
 
 class ControllerTest extends Controller {
   static mixins = [ControllerMixinDatabase, ControllerMixinORMWrite];

@@ -33,8 +33,8 @@ const parseClassField = async (result, postData, Model, currentID = '?') => {
 
   await Promise.all(
   [...postData.entries()].map(async (it) => {
-    const v = it[0];
-    const key = it[1];
+    const key = it[0];
+    const v = it[1];
 
     const matches = pattern.exec(key);
     if (!matches) return;
@@ -69,8 +69,8 @@ const parseChildField = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?>(\w+)(\(\d*\))?(-\w+)?:(\w+)$/;
   await Promise.all(
   [...postData.entries()].map(async (it) => {
-    const v = it[0];
-    const key = it[1];
+    const key = it[0];
+    const v = it[1];
     const matches = pattern.exec(key);
     if (!matches) return;
 
@@ -100,8 +100,8 @@ const parseAddSibling = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?\*(\w+)$/;
   await Promise.all(
   [...postData.entries()].map(async (it) => {
-    const v = it[0];
-    const key = it[1];
+    const key = it[0];
+    const v = it[1];
     const matches = pattern.exec(key);
     if (!matches) return;
     if (!Array.isArray(v)) throw new Error(`${key} must be array`);
@@ -179,9 +179,9 @@ export default class ORMInput extends ControllerMixin {
     const updates = new Map();
 
     await parseClassField(updates, postData, model, id);
-    parseChildField(updates, postData, model, id);
-    parseAddSibling(updates, postData, model, id);
-    parseChainChild(updates, postData, model, id);
+    await parseChildField(updates, postData, model, id);
+    await parseAddSibling(updates, postData, model, id);
+    await parseChainChild(updates, postData, model, id);
 
     state.set(this.ORM_INPUT, updates);
   }
