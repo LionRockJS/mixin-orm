@@ -1,4 +1,4 @@
-import { ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 import ControllerMixinORMInput from './ORMInput';
 import ControllerMixinORMRead from './ORMRead';
@@ -13,7 +13,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
   static INSTANCE = 'instance';
 
   static init(state) {
-    state.set(this.DATABASE_KEY, '');
+    state.set(ControllerMixinORMWrite.DATABASE_KEY, '');
   }
 
   /**
@@ -53,8 +53,8 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
    * @returns {Promise<void>}
    */
   static async action_update(state) {
-    const client = state.get(ControllerMixin.STATE_CLIENT);
-    const { request } = client;
+    const client = state.get(Controller.STATE_CLIENT);
+    const request = state.get(Controller.STATE_REQUEST);
     const { id } = request.params;
 
     const model = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
@@ -103,7 +103,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         const key = v[0];
         if (!/^[*:]/.test(key)) return;
 
-        const ModelB = ORM.require(key.slice(1));
+        const ModelB = await ORM.import(key.slice(1));
         const models = v[1].filter(id => id !== 'replace').map(id => new ModelB(id, orm_options));
         if (models.length === 0) return;
         await instance.add(models);
@@ -131,7 +131,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         // this type is empty, quit;
         if (x[1].size === 0) return;
 
-        const Model = ORM.require(x[0]);
+        const Model = await ORM.import(x[0]);
         const ids = Array.from(x[1].keys());
 
         const results = await ORM.readBy(Model, 'id', ids, { ...orm_options, asArray: true });
@@ -199,7 +199,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         const list = x[1];
         const type = x[0];
 
-        const Model = ORM.require(type);
+        const Model = await ORM.import(type);
 
         const newValues = x[1].get('?');
         if (!newValues) return;

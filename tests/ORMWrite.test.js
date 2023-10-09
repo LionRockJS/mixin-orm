@@ -22,12 +22,12 @@ import Media from './classes/Media.mjs';
 import ModelTest from './classes/ModelTest.mjs';
 import ModelChild from './classes/ModelChild.mjs';
 
-Central.classPath.set('model/Product.js', Product);
-Central.classPath.set('model/Media.js', Media);
-Central.classPath.set('model/Person.js', Person);
-Central.classPath.set('model/ModelTest.js', ModelTest);
-Central.classPath.set('model/User.js', User);
-Central.classPath.set('model/ModelChild.js', ModelChild);
+Central.classPath.set('model/Product.mjs', Product);
+Central.classPath.set('model/Media.mjs', Media);
+Central.classPath.set('model/Person.mjs', Person);
+Central.classPath.set('model/ModelTest.mjs', ModelTest);
+Central.classPath.set('model/User.mjs', User);
+Central.classPath.set('model/ModelChild.mjs', ModelChild);
 ORM.defaultAdapter = ORMAdapterSQLite;
 
 import ControllerMixinORMInput from '../classes/controller-mixin/ORMInput';
@@ -37,7 +37,10 @@ class ControllerTest extends Controller {
   static mixins = [ControllerMixinDatabase, ControllerMixinORMWrite];
 
   constructor(request, input, Model, db) {
-    super(request);
+    super(request, new Map([
+      [ControllerMixinORMWrite.DATABASE_KEY, 'admin'],
+      [ControllerMixinORMInput.ORM_INPUT, input],
+    ]));
     this.model = Model;
     this.sql = [];
     this.queries = [];
@@ -64,8 +67,6 @@ class ControllerTest extends Controller {
     };
 
     this.state.get(ControllerMixinDatabase.DATABASES).set('admin', this.database);
-    this.state.set(ControllerMixinORMWrite.DATABASE_KEY, 'admin');
-    this.state.set(ControllerMixinORMInput.ORM_INPUT, input);
   }
 
   async action_index() {
