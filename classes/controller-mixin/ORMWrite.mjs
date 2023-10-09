@@ -13,7 +13,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
   static INSTANCE = 'instance';
 
   static init(state) {
-    state.set(ControllerMixinORMWrite.DATABASE_KEY, '');
+    if (!state.get(ControllerMixinORMWrite.DATABASE_KEY))state.set(ControllerMixinORMWrite.DATABASE_KEY, '');
   }
 
   /**

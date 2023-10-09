@@ -3,7 +3,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/
 
 import fs from 'node:fs';
 import path from 'node:path';
-import qs from 'node:querystring';
 import Database from 'better-sqlite3';
 
 import { Controller } from '@lionrockjs/mvc';

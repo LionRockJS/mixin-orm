@@ -1,4 +1,4 @@
-import { ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { ORM } from '@lionrockjs/central';
 
 const mapGetOrCreate = (map, key, defaultValue) => {
@@ -28,10 +28,14 @@ const parseFK = (code, defaultFK) => {
   return code.replace(/^-/, '');
 };
 
-const parseClassField = (result, postData, Model, currentID = '?') => {
+const parseClassField = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?:(\w+)$/;
 
-  postData.forEach((v, key) => {
+  await Promise.all(
+  [...postData.entries()].map(async (it) => {
+    const v = it[0];
+    const key = it[1];
+
     const matches = pattern.exec(key);
     if (!matches) return;
 
@@ -41,7 +45,7 @@ const parseClassField = (result, postData, Model, currentID = '?') => {
     const value = Array.isArray(v) ? v.map(x => parseInt(x, 10)) : v;
 
     if (Array.isArray(v)) {
-      const Type = ORM.require(prop);
+      const Type = await ORM.import(prop);
       if (!Model.belongsToMany.has(prop) && !Type.belongsToMany.has(type)) throw new Error(`Invalid input siblings ${prop} for ${Model.name}`);
     } else if (!Model.fields.has(prop) && !Model.belongsTo.has(prop)) {
       throw new Error(`Invalid input field ${prop} for ${Model.name}`);
@@ -56,13 +60,17 @@ const parseClassField = (result, postData, Model, currentID = '?') => {
 
     instanceTypeId.set(prop, value);
     postData.delete(key);
-  });
+  }));
+
   return result;
 };
 
-const parseChildField = (result, postData, Model, currentID = '?') => {
+const parseChildField = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?>(\w+)(\(\d*\))?(-\w+)?:(\w+)$/;
-  postData.forEach((v, key) => {
+  await Promise.all(
+  [...postData.entries()].map(async (it) => {
+    const v = it[0];
+    const key = it[1];
     const matches = pattern.exec(key);
     if (!matches) return;
 
@@ -76,7 +84,7 @@ const parseChildField = (result, postData, Model, currentID = '?') => {
     const prop = matches[5];
     const value = Array.isArray(v) ? v.map(x => parseInt(x, 10)) : v;
 
-    const Type = ORM.require(type);
+    const Type = await ORM.import(type);
     if (!(Type.fields.has(prop) || Type.belongsTo.has(prop))) throw new Error(`Invalid input field ${prop} for ${Type.name}`);
     if (!(Type.belongsTo.has(fk) || Type.hasMany.map(x=>x[1]).includes(Model.name))) throw new Error(`Invalid FK ${fk} for ${Type.name}`);
 
@@ -85,13 +93,15 @@ const parseChildField = (result, postData, Model, currentID = '?') => {
     instanceTypeId.set(prop, value);
 
     postData.delete(key);
-  });
+  }));
 };
 
-const parseAddSibling = (result, postData, Model, currentID = '?') => {
+const parseAddSibling = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?\*(\w+)$/;
-
-  postData.forEach((v, key) => {
+  await Promise.all(
+  [...postData.entries()].map(async (it) => {
+    const v = it[0];
+    const key = it[1];
     const matches = pattern.exec(key);
     if (!matches) return;
     if (!Array.isArray(v)) throw new Error(`${key} must be array`);
@@ -101,7 +111,7 @@ const parseAddSibling = (result, postData, Model, currentID = '?') => {
     const prop = `*${matches[2]}`;
     const value = v.map(x => ((x === 'replace') ? x : parseInt(x, 10)));
 
-    const Type = ORM.require(type);
+    const Type = await ORM.import(type);
     if (!Model.belongsToMany.has(type) && !Type.belongsToMany.has(Model.name)) {
       throw new Error(`Invalid hasAndBelongsToMany ${type} and ${Model.name}`);
     }
@@ -111,18 +121,21 @@ const parseAddSibling = (result, postData, Model, currentID = '?') => {
     instanceTypeId.set(prop, value);
 
     postData.delete(key);
-  });
+  }));
   return result;
 };
 
-const parseChainChild = (result, postData, Model, currentID = '?') => {
+const parseChainChild = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?(>(\w+)(\(\d*\)))?(>(\w+)(\(\d*\)))?(>(\w+)(\(\d*\)))?(>(\w+)(\(\d*\)))?(>(\w+)(\(\d*\)))?:(\w+)$/;
 
-  postData.forEach((v, key) => {
+  await Promise.all(
+  [...postData.entries()].map(async (it) => {
+    const v = it[0];
+    const key = it[1];
     const matches = pattern.exec(key);
     if (!matches) return;
 
-    const types = [matches[3], matches[6], matches[9], matches[12], matches[15]].filter(x => !!x).map(x => ORM.require(x));
+    const types = [matches[3], matches[6], matches[9], matches[12], matches[15]].filter(x => !!x).map(async x => await ORM.import(x));
     const ids = [matches[4], matches[7], matches[10], matches[13], matches[16]].filter(x => !!x);
     types.unshift(Model);
     types.forEach((m, i) => {
@@ -142,7 +155,7 @@ const parseChainChild = (result, postData, Model, currentID = '?') => {
     instanceTypeId.set(prop, value);
 
     postData.delete(key);
-  });
+  }));
 };
 
 // parse form input to update list, with validate
@@ -154,17 +167,18 @@ export default class ORMInput extends ControllerMixin {
   static POST = '$_POST';
 
   static async action_update(state) {
-    const client = state.get('client');
-    const model = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
+    const client  = state.get(Controller.STATE_CLIENT);
+    const request = state.get(Controller.STATE_REQUEST);
+    const model   = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
 
-    const { id } = client.request.params;
+    const { id } = request.params;
     const $_POST = state.get(this.POST);
     const postData = new Map(Object.entries($_POST));
     // parse postData;
     // find instance fields
     const updates = new Map();
 
-    parseClassField(updates, postData, model, id);
+    await parseClassField(updates, postData, model, id);
     parseChildField(updates, postData, model, id);
     parseAddSibling(updates, postData, model, id);
     parseChainChild(updates, postData, model, id);

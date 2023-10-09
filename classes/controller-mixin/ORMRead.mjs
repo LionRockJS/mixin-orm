@@ -31,15 +31,18 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   }
 
   static init(state) {
-    state.set(this.ORM_OPTIONS, new Map([
-      ['orderBy', new Map([['id', 'ASC']])],
-      ['limit', 50],
-      ...state.get(this.ORM_OPTIONS) || [],
-    ]));
 
-    state.set(this.DATABASE_KEY, state.get(this.DATABASE_KEY) ?? 'admin');
-    state.set(this.MODEL, state.get(this.MODEL));
-    state.set(this.LIST_FILTER, state.get(this.LIST_FILTER) ?? []);
+    if (!state.get(this.ORM_OPTIONS)) {
+      state.set(this.ORM_OPTIONS, new Map([
+        ['orderBy', new Map([['id', 'ASC']])],
+        ['limit', 50],
+        ...state.get(this.ORM_OPTIONS) || [],
+      ]));
+    }
+
+    if (!state.get(this.DATABASE_KEY)) state.set(this.DATABASE_KEY, 'admin');
+    if (!state.get(this.MODEL)) state.set(this.MODEL, state.get(this.MODEL));
+    if (!state.get(this.LIST_FILTER)) state.set(this.LIST_FILTER, []);
 
     //security check order by options
     const orderBy = state.get(this.ORM_OPTIONS).get('orderBy');

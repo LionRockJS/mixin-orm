@@ -23,11 +23,10 @@ class ControllerTest extends Controller {
   static mixins = [ControllerMixinORMInput];
 
   constructor(request, Model) {
-    super(request);
-    this.model = Model;
-
-    const $_POST = (typeof this.request.body === 'object') ? this.request.body : qs.parse(this.request.body);
-    this.state.set(ControllerMixinORMInput.POST, $_POST);
+    super(request, new Map([
+      [ControllerMixinORMInput.POST, (typeof request.body === 'object') ? request.body : qs.parse(request.body)],
+      [ControllerMixinORMInput.MODEL, Model],
+    ]));
   }
 
   async action_index() {
