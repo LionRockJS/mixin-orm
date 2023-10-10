@@ -31,14 +31,11 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   }
 
   static init(state) {
-
-    if (!state.get(this.ORM_OPTIONS)) {
-      state.set(this.ORM_OPTIONS, new Map([
-        ['orderBy', new Map([['id', 'ASC']])],
-        ['limit', 50],
-        ...state.get(this.ORM_OPTIONS) || [],
-      ]));
-    }
+    state.set(this.ORM_OPTIONS, new Map([
+      ['orderBy', new Map([['id', 'ASC']])],
+      ['limit', 50],
+      ...state.get(this.ORM_OPTIONS) || [],
+    ]));
 
     if (!state.get(this.DATABASE_KEY)) state.set(this.DATABASE_KEY, 'admin');
     if (!state.get(this.MODEL)) state.set(this.MODEL, state.get(this.MODEL));

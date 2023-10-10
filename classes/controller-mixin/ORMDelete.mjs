@@ -1,6 +1,7 @@
 import { ControllerMixin } from '@lionrockjs/mvc';
 import { Central, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 import { HelperCrypto } from '@lionrockjs/mod-crypto';
+import ControllerMixinORMRead from './ORMRead.mjs';
 
 export default class ControllerMixinORMDelete extends ControllerMixin {
   static DELETE_SIGN = 'deleteSign';
@@ -17,9 +18,9 @@ export default class ControllerMixinORMDelete extends ControllerMixin {
     const client = state.get('client');
     const { request } = client;
     const { id } = request.params;
-    const model = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
+    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
 
-    if (!id) throw new Error(`Delete ${model.name} require object id`);
+    if (!id) throw new Error(`Delete ${model.name} without object id`);
 
     const { deleteKey } = Central.config.database;
     const value = model.tableName + id;

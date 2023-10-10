@@ -1,5 +1,6 @@
 import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { ORM } from '@lionrockjs/central';
+import ControllerMixinORMRead from './ORMRead.mjs';
 
 const mapGetOrCreate = (map, key, defaultValue) => {
   const result = map.get(key);
@@ -31,8 +32,7 @@ const parseFK = (code, defaultFK) => {
 const parseClassField = async (result, postData, Model, currentID = '?') => {
   const pattern = /^(\(\d+\))?:(\w+)$/;
 
-  await Promise.all(
-  [...postData.entries()].map(async (it) => {
+  await Promise.all([...postData.entries()].map(async (it) => {
     const key = it[0];
     const v = it[1];
 
@@ -97,9 +97,8 @@ const parseChildField = async (result, postData, Model, currentID = '?') => {
 };
 
 const parseAddSibling = async (result, postData, Model, currentID = '?') => {
-  const pattern = /^(\(\d+\))?\*(\w+)$/;
-  await Promise.all(
-  [...postData.entries()].map(async (it) => {
+  const pattern = /^(\(\d+\))?\*(\w+)([\[(][\])])$/;
+  await Promise.all([...postData.entries()].map(async (it) => {
     const key = it[0];
     const v = it[1];
     const matches = pattern.exec(key);
@@ -169,7 +168,7 @@ export default class ORMInput extends ControllerMixin {
   static async action_update(state) {
     const client  = state.get(Controller.STATE_CLIENT);
     const request = state.get(Controller.STATE_REQUEST);
-    const model   = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
+    const model   = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
 
     const { id } = request.params;
     const $_POST = state.get(this.POST);

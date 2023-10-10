@@ -57,7 +57,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
     const request = state.get(Controller.STATE_REQUEST);
     const { id } = request.params;
 
-    const model = state.get(this.MODEL) ?? state.get('orm_model') ?? client.model;
+    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
     const databaseKey = state.get(this.DATABASE_KEY) || state.get(ControllerMixinORMRead.DATABASE_KEY);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(databaseKey);
 

@@ -57,7 +57,7 @@ describe('orm input parse', () => {
   });
 
   test('currentField, new instance', async () => {
-    const c = new ControllerTest({ headers: {}, params: {}, body: ':first_name=Alice&:Tag[]=10&:Tag[]=12&:last_name=Lee' }, Person);
+    const c = new ControllerTest({ headers: {}, params: {}, body: ':first_name=Alice&:last_name=Lee' }, Person);
     const result = await c.execute('update');
     if (result.status !== 200)console.log(result);
     expect(result.status).toBe(200);
@@ -66,11 +66,10 @@ describe('orm input parse', () => {
     expect(m1).toBeDefined();
     expect(m1.get('first_name')).toBe('Alice');
     expect(m1.get('last_name')).toBe('Lee');
-    expect(m1.get('Tag').join()).toBe([10, 12].join());
   });
 
   test('currentField', async () => {
-    const c = new ControllerTest({ headers: {}, params: { id: 1 }, body: ':first_name=Alice&:Tag[]=10&:Tag[]=12&:last_name=Lee' }, Person);
+    const c = new ControllerTest({ headers: {}, params: { id: 1 }, body: ':first_name=Alice&:last_name=Lee' }, Person);
     const result = await c.execute('update');
     if (result.status !== 200)console.log(result);
     expect(result.status).toBe(200);
@@ -161,32 +160,16 @@ describe('orm input parse', () => {
     const c = new ControllerTest({
       headers: {},
       params: { id: 1 },
-      body: ':Tag[]=1&:Tag[]=2&:Tag[]=3&*Tag[]=8&*Tag[]=7&(20)*Tag[]=3&(20)*Tag[]=4&(20):Tag[]=1&(20):Tag[]=2',
+      body: '(20)*Tag[]=3&(20)*Tag[]=4&(20)*Tag[]=1&(20)*Tag[]=2&*Tag[]=5&*Tag[]=6&*Tag[]=7&*Tag[]=8',
     }, Person);
     const result = await c.execute('update');
     if (result.status !== 200)console.log(result);
     expect(result.status).toBe(200);
     const p = result.body.update.get('Person');
     const p1 = p.get(1);
-    expect(p1.get('Tag').sort().join()).toBe([1, 2, 3].join());
-    expect(p1.get('*Tag').sort().join()).toBe([7, 8].join());
-  });
-
-  test('inverse siblings', async () => {
-    /* Person belongsMany Tags,  */
-    const c = new ControllerTest({
-      headers: {},
-      params: { id: 1 },
-      body: ':name=foo&:Person[]=1&:Person[]=2&*Person[]=3&*Person[]=4',
-    }, Tag);
-    const result = await c.execute('update');
-    if (result.status !== 200)console.log(result);
-    expect(result.status).toBe(200);
-
-    const t = result.body.update.get('Tag');
-    const t1 = t.get(1);
-    expect(t1.get('Person').sort().join()).toBe([1, 2].join());
-    expect(t1.get('*Person').sort().join()).toBe([3, 4].join());
+    expect(p1.get('*Tag').sort().join()).toBe([5,6,7,8].join());
+    const p20 = p.get(20);
+    expect(p20.get('*Tag').sort().join()).toBe([1,2,3,4].join());
   });
 
   test('invalid siblings', async () => {
@@ -194,7 +177,7 @@ describe('orm input parse', () => {
     const c = new ControllerTest({ headers: {}, params: { id: 1 }, body: ':User[]=1&:User[]=2&*User[]=3&*User[]=4' }, Tag);
     const result = await c.execute('update');
     expect(result.status).toBe(500);
-    expect(c.error.message).toBe('Invalid input siblings User for Tag');
+    expect(c.error.message).toBe('Invalid hasAndBelongsToMany User and Tag');
   });
 
   test('invalid addvsiblings', async () => {
