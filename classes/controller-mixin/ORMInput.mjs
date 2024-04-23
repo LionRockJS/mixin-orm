@@ -166,11 +166,8 @@ export default class ORMInput extends ControllerMixin {
   static POST = '$_POST';
 
   static async action_update(state) {
-    const client  = state.get(Controller.STATE_CLIENT);
-    const request = state.get(Controller.STATE_REQUEST);
-    const model   = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
-
-    const { id } = request.params;
+    const model   = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
+    const { id } = state.get(Controller.STATE_PARAMS);
     const $_POST = state.get(this.POST);
     const postData = new Map(Object.entries($_POST));
     // parse postData;

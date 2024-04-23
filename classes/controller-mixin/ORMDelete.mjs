@@ -1,4 +1,4 @@
-import { ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { Central, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 import { HelperCrypto } from '@lionrockjs/mod-crypto';
 import ControllerMixinORMRead from './ORMRead.mjs';
@@ -15,10 +15,9 @@ export default class ControllerMixinORMDelete extends ControllerMixin {
   static MODEL = 'deleteModel';
 
   static async action_delete(state) {
-    const client = state.get('client');
-    const { request } = client;
-    const { id } = request.params;
-    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
+    const request = state.get(Controller.STATE_REQUEST);
+    const { id } = state.get(Controller.STATE_PARAMS);
+    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
 
     if (!id) throw new Error(`Delete ${model.name} without object id`);
 

@@ -17,47 +17,14 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
   }
 
   /**
-   * @param client
-   * @param Model
-   * @param database
-   * @param {function | object} ORMInput
-   input example:
-   Map(2) {
-  'Variant' => Map(1) {
-    '3818858229520' => Map(10) {
-      'product_id' => '2241418003820',
-      'title' => '5000cl',
-      'price' => '100000',
-      'compare_at_price' => '',
-      'taxable' => 'FALSE',
-      'sku' => '',
-      'barcode' => '',
-      'inventory_policy' => '',
-      'requires_shipping' => '1',
-      'weight' => ''
-    }
-  },
-  'Inventory' => Map(1) {
-    '?' => Map(2) {
-      '.variant_id:Variant' => '3818858229520',
-      'quantity' => '1000'
-    }
-  }
-}
-
-   */
-
-  /**
    *
    * @param state
    * @returns {Promise<void>}
    */
   static async action_update(state) {
-    const client = state.get(Controller.STATE_CLIENT);
-    const request = state.get(Controller.STATE_REQUEST);
-    const { id } = request.params;
+    const { id } = state.get(Controller.STATE_PARAMS);
 
-    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL) ?? client.model;
+    const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
     const databaseKey = state.get(this.DATABASE_KEY) || state.get(ControllerMixinORMRead.DATABASE_KEY);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(databaseKey);
 

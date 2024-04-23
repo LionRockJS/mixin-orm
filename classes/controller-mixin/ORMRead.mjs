@@ -1,4 +1,4 @@
-import { ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 
 export default class ControllerMixinORMRead extends ControllerMixin {
@@ -17,17 +17,10 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   static LIST_FILTER = 'listFilter';
 
   static #formatDate(date) {
-    let d = date,
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2)
-      month = '0' + month;
-    if (day.length < 2)
-      day = '0' + day;
-
-    return [year, month, day].join('-');
+    const YYYY  = date.getFullYear();
+    const MONTH = String(date.getMonth() + 1).padStart(2, '0');
+    const DATE  = String( date.getDate() ).padStart(2, '0');
+    return `${YYYY}-${MONTH}-${DATE}`;
   }
 
   static init(state) {
@@ -64,8 +57,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   }
 
   static async action_index(state) {
-    const client = state.get(ControllerMixin.CLIENT);
-    const model = state.get(this.MODEL) ?? client.model;
+    const model = state.get(this.MODEL);
 
     if (!model) return;
     this.verify_order_by_columns(model, state);
@@ -73,11 +65,12 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     const database = state.get(ControllerMixinDatabase.DATABASES)?.get(state.get(this.DATABASE_KEY)) ?? ORM.database;
     const options = Object.fromEntries(state.get(this.ORM_OPTIONS).entries());
 
-    const page = parseInt(client.request.query.page ?? '1', 10) - 1;
+    const query = state.get(Controller.STATE_QUERY);
+    const page = parseInt(query.page ?? '1', 10) - 1;
     const offset = page * options.limit;
 
-    const start = client.request.query.start ?? '1970-1-1';
-    const end = this.#formatDate(new Date(new Date(client.request.query.end ?? '2999-12-31').getTime() + 86400000));
+    const start = query.start ?? '1970-1-1';
+    const end = this.#formatDate(new Date(new Date(query.end ?? '2999-12-31').getTime() + 86400000));
 
     const criteria = [
       ['', 'created_at', 'GREATER_THAN_EQUAL', `${start} 00:00:00+08:00`],
@@ -92,13 +85,12 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   }
 
   static async action_read(state) {
-    const client = state.get(ControllerMixin.CLIENT);
-    const model = state.get(this.MODEL) ?? client.model;
+    const model = state.get(this.MODEL);
 
     if (!model) throw new Error('Controller Mixin ORM Read without model');
     this.verify_order_by_columns(model, state);
 
-    const id = client.request.params.id;
+    const {id} = state.get(Controller.STATE_PARAMS);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(state.get(this.DATABASE_KEY));
 
     state.set(this.COUNT, await ORM.count(model, { database }));
