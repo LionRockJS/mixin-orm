@@ -30,13 +30,13 @@ class ControllerTest extends Controller {
   }
 
   async action_index() {
-    this.body = 'index';
+    this.state.set(Controller.STATE_BODY, 'index');
   }
 
   async action_update() {
-    this.body = {
+    this.state.set(Controller.STATE_BODY, {
       update: this.state.get(ControllerMixinORMInput.ORM_INPUT),
-    };
+    });
   }
 }
 

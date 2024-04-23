@@ -39,7 +39,9 @@ class ControllerTest extends Controller {
       [ControllerMixinORMWrite.DATABASE_KEY, 'admin'],
       [ControllerMixinORMInput.ORM_INPUT, input],
     ]));
-    this.model = Model;
+
+    this.state.set('orm_model', Model);
+
     this.sql = [];
     this.queries = [];
 
@@ -68,15 +70,15 @@ class ControllerTest extends Controller {
   }
 
   async action_index() {
-    this.body = 'index';
+    this.state.set(Controller.STATE_BODY, 'index');
   }
 
   async action_update() {
-    this.body = {
+    this.state.set(Controller.STATE_BODY, {
       sql: this.sql,
       queries: this.queries,
       instance: this.state.get('instance'),
-    };
+    });
   }
 }
 
