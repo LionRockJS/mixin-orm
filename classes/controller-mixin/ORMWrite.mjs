@@ -1,7 +1,7 @@
 import { Controller, ControllerMixin } from '@lionrockjs/mvc';
 import { ORM, ControllerMixinDatabase } from '@lionrockjs/central';
-import ControllerMixinORMInput from './ORMInput';
-import ControllerMixinORMRead from './ORMRead';
+import ControllerMixinORMInput from './ORMInput.mjs';
+import ControllerMixinORMRead from './ORMRead.mjs';
 
 export default class ControllerMixinORMWrite extends ControllerMixin {
   static DATABASE_KEY = 'ormDatabaseWriteKey';
