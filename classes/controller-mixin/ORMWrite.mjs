@@ -141,16 +141,20 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
               await instance.write();
 
               const manyOps = [];
-              Model.belongsToMany.forEach(xx => {
-                const k = `*${xx}`;
-                if (m[k] === undefined) return;
-                if (!Array.isArray(m[k])) throw new Error(`${k} must be Array`);
+              await Promise.all(
 
-                const ModelB = ORM.require(k.slice(1));
-                const many = m[k].filter(nid => nid !== 'replace').map(nid => new ModelB(nid, orm_options));
-                if (many.length !== m[k].length)manyOps.push(instance.removeAll(ModelB));
-                if (many.length > 0)manyOps.push(instance.add(many));
-              });
+                [...Model.belongsToMany].map(async xx => {
+                  const k = `*${xx}`;
+                  if (m[k] === undefined) return;
+                  if (!Array.isArray(m[k])) throw new Error(`${k} must be Array`);
+
+                  const ModelB = await ORM.import(k.slice(1));
+                  const many = m[k].filter(nid => nid !== 'replace').map(nid => new ModelB(nid, orm_options));
+                  if (many.length !== m[k].length)manyOps.push(instance.removeAll(ModelB));
+                  if (many.length > 0)manyOps.push(instance.add(many));
+                })
+
+              );
 
               await Promise.all(manyOps);
             }

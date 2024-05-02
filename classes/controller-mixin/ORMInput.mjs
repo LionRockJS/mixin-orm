@@ -97,7 +97,7 @@ const parseChildField = async (result, postData, Model, currentID = '?') => {
 };
 
 const parseAddSibling = async (result, postData, Model, currentID = '?') => {
-  const pattern = /^(\(\d+\))?\*(\w+)([\[(][\])])$/;
+  const pattern = /^(\(\d+\))?\*(\w+)([\[(][\])])?$/;
   await Promise.all([...postData.entries()].map(async (it) => {
     const key = it[0];
     const v = it[1];
