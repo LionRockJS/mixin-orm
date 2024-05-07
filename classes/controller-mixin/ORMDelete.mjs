@@ -1,6 +1,5 @@
 import { Controller, ControllerMixin } from '@lionrockjs/mvc';
-import { Central, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
-import { HelperCrypto } from '@lionrockjs/mod-crypto';
+import { Central, ORM, ControllerMixinDatabase, HelperCrypto } from '@lionrockjs/central';
 import ControllerMixinORMRead from './ORMRead.mjs';
 
 export default class ControllerMixinORMDelete extends ControllerMixin {
