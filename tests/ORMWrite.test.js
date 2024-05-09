@@ -6,7 +6,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 import { Controller } from '@lionrockjs/mvc';
-import { Central, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
+import { Central, ORM, Model, ControllerMixinDatabase } from '@lionrockjs/central';
 import { ORMAdapterSQLite } from '@lionrockjs/adapter-database-better-sqlite3';
 
 import ControllerMixinORMInput from '../classes/controller-mixin/ORMInput';
@@ -29,7 +29,7 @@ Central.classPath.set('model/Person.mjs', Person);
 Central.classPath.set('model/ModelTest.mjs', ModelTest);
 Central.classPath.set('model/User.mjs', User);
 Central.classPath.set('model/ModelChild.mjs', ModelChild);
-ORM.defaultAdapter = ORMAdapterSQLite;
+Model.defaultAdapter = ORMAdapterSQLite;
 
 class ControllerTest extends Controller {
   static mixins = [ControllerMixinDatabase, ControllerMixinORMWrite];
@@ -210,7 +210,7 @@ CREATE TRIGGER parents_updated_at AFTER UPDATE ON parents WHEN old.updated_at < 
 UPDATE parents SET updated_at = CURRENT_TIMESTAMP WHERE id = old.id;
 END;`);
 
-  ORM.database = database;
+  Model.database = database;
   return database;
 })();
 
