@@ -1,6 +1,6 @@
-import { ORM } from '@lionrockjs/central';
+import { Model } from '@lionrockjs/central';
 
-export default class ModelParent extends ORM{
+export default class ModelParent extends Model{
   name=null;
   static joinTablePrefix = 'parent';
   static tableName = 'parents';

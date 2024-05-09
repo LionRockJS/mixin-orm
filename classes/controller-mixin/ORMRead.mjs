@@ -93,7 +93,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     const {id} = state.get(Controller.STATE_PARAMS);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(state.get(this.DATABASE_KEY));
 
-    state.set(this.COUNT, await ORM.count(model, { database }));
+    state.set(this.COUNT, await ORM.countAll(model, { database }));
     state.set(this.INSTANCE, await ORM.factory(model, id, { database }));
   }
 

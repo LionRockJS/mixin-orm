@@ -98,10 +98,10 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         // this type is empty, quit;
         if (x[1].size === 0) return;
 
-        const Model = await ORM.import(x[0]);
+        const MClass = await ORM.import(x[0]);
         const ids = Array.from(x[1].keys());
 
-        const results = await ORM.readBy(Model, 'id', ids, { ...orm_options, asArray: true });
+        const results = await ORM.readBy(MClass, 'id', ids, { ...orm_options, asArray: true });
 
         await Promise.all(
           results.map(async model => {
@@ -113,21 +113,21 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
             const newValues = x[1].get(m.id) ?? x[1].get(String(m.id));
             let changed = false;
 
-            Model.fields.forEach((xx, field) => {
+            MClass.fields.forEach((xx, field) => {
               const v = newValues.get(field);
               if (v === undefined) return;
               m[field] = v;
               changed = true;
             });
 
-            Model.belongsTo.forEach((xx, field) => {
+            MClass.belongsTo.forEach((xx, field) => {
               const v = newValues.get(field);
               if (v === undefined || v === '') return;
               m[field] = v;
               changed = true;
             });
 
-            Model.belongsToMany.forEach(field => {
+            MClass.belongsToMany.forEach(field => {
               const k = `*${field}`;
               const v = newValues.get(k);
               if (v === undefined || v === '') return;
@@ -136,14 +136,14 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
             });
 
             if (changed) {
-              const instance = new Model(m.id, orm_options);
+              const instance = new MClass(m.id, orm_options);
               Object.assign(instance, m);
               await instance.write();
 
               const manyOps = [];
               await Promise.all(
 
-                [...Model.belongsToMany].map(async xx => {
+                [...MClass.belongsToMany].map(async xx => {
                   const k = `*${xx}`;
                   if (m[k] === undefined) return;
                   if (!Array.isArray(m[k])) throw new Error(`${k} must be Array`);

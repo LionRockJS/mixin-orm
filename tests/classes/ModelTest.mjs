@@ -1,6 +1,6 @@
-import { ORM } from '@lionrockjs/central';
+import { Model } from '@lionrockjs/central';
 
-export default class ModelTest extends ORM {
+export default class ModelTest extends Model {
   name=null;
 
   enabled = true;
