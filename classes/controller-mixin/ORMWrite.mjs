@@ -49,7 +49,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
   /**
    *
    * @param {Map} input
-   * @param {ORM} model
+   * @param {Model} model
    * @param {Object} orm_options
    */
   static async #newInstance(input, model, orm_options) {
@@ -170,23 +170,23 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         const list = x[1];
         const type = x[0];
 
-        const Model = await ORM.import(type);
+        const MClass = await ORM.import(type);
 
         const newValues = x[1].get('?');
         if (!newValues) return;
         // the map have no fields, skip it.
         if (newValues.size <= 1) return;
 
-        const instance = ORM.create(Model, orm_options);
+        const instance = ORM.create(MClass, orm_options);
 
-        Model.fields.forEach((xx, field) => {
+        MClass.fields.forEach((xx, field) => {
           const v = newValues.get(field);
           if (v === undefined || v === '') return;
           instance[field] = v;
           newValues.delete(field);
         });
 
-        Model.belongsTo.forEach((ParentModel, fk) => {
+        MClass.belongsTo.forEach((ParentModel, fk) => {
           const parentID = newValues.get(`.${fk}:${ParentModel}`);
           if (!parentID) return;
           instance[fk] = (parentID === '?') ? parent.id : parentID;
