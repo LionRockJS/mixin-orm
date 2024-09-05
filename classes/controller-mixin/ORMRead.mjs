@@ -106,7 +106,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     const model = state.get(this.MODEL);
 
     if (!model) throw new Error('Controller Mixin ORM Read without model');
-    this.verify_order_by_columns(model, state);
+    this.verfiy_order_by(state);
 
     const {id} = state.get(Controller.STATE_PARAMS);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(state.get(this.DATABASE_KEY));
