@@ -1,5 +1,4 @@
-import { Controller, ControllerMixin } from '@lionrockjs/mvc';
-import { ORM, ControllerMixinDatabase } from '@lionrockjs/central';
+import { Controller, ControllerMixin, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
 
 export default class ControllerMixinORMRead extends ControllerMixin {
   static ORM_OPTIONS = 'orm_read_options';
@@ -35,18 +34,23 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     if (!state.get(this.LIST_FILTER)) state.set(this.LIST_FILTER, []);
 
     //security check order by options
+    this.verfiy_order_by(state);
+  }
+
+  static verfiy_order_by(state){
     const orderBy = state.get(this.ORM_OPTIONS).get('orderBy');
     [...orderBy.values()].forEach(it => {
       const orderDirection = it.trim().toUpperCase();
       if(orderDirection !== 'ASC' && orderDirection !== 'DESC'){
         throw new Error('ORDER BY must be ASC or DESC, received:' + orderDirection);
       }
-    })
-  }
+    });
 
-  static verify_order_by_columns(Model, state){
-    const orderBy = state.get(this.ORM_OPTIONS).get('orderBy');
-    //keys should be column names
+    const Model = state.get(this.MODEL);
+    if (!Model){
+      throw new Error('Controller Mixin ORM Read without model');
+    };
+
     const columns = [...Model.fields.keys()];
     [...orderBy.keys()].forEach(it => {
       if(it === 'id' || it === 'created_at' || it === 'updated_at') return;
@@ -58,9 +62,9 @@ export default class ControllerMixinORMRead extends ControllerMixin {
 
   static async action_index(state) {
     const model = state.get(this.MODEL);
-
     if (!model) return;
-    this.verify_order_by_columns(model, state);
+
+    this.verfiy_order_by(state);
 
     const database = state.get(ControllerMixinDatabase.DATABASES)?.get(state.get(this.DATABASE_KEY)) ?? ORM.database;
     const options = Object.fromEntries(state.get(this.ORM_OPTIONS).entries());
