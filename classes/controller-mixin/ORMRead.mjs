@@ -49,9 +49,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     });
 
     const Model = state.get(this.MODEL);
-    if (!Model){
-      throw new Error('Controller Mixin ORM Read without model');
-    };
+    if (!Model)return;
 
     const columns = [...Model.fields.keys()];
     [...orderBy.keys()].forEach(it => {
