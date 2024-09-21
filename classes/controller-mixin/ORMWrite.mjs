@@ -23,17 +23,26 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
    */
   static async action_update(state) {
     const { id } = state.get(Controller.STATE_PARAMS);
-
+    const input = state.get(ControllerMixinORMInput.ORM_INPUT);
     const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
     const databaseKey = state.get(this.DATABASE_KEY) || state.get(ControllerMixinORMRead.DATABASE_KEY);
     const database = state.get(ControllerMixinDatabase.DATABASES).get(databaseKey);
+
+    if(input.size === 0){//no input data, instance just return the instance by id
+      try{
+        const ins = await ORM.factory(model, id, {database});
+        state.set(this.INSTANCE, ins);
+        return;
+      }catch(e){
+        throw new Error(`Instance not found with id ${id}`);
+      }
+    }
 
     const mergedOptions = new Map([...state.get(ControllerMixinORMRead.ORM_OPTIONS) || [], ...(state.get(this.ORM_OPTIONS) || [])]);
     const ormOptions = Object.fromEntries(mergedOptions.entries());
     ormOptions.orderBy = new Map([['id', 'ASC']]);
     ormOptions.database = database;
 
-    const input = state.get(ControllerMixinORMInput.ORM_INPUT);
     const ins = await this.#newInstance(input, model, ormOptions);
 
     // assign new created instance to client
