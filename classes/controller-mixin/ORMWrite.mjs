@@ -1,5 +1,5 @@
 import { Controller, ControllerMixin } from '@lionrockjs/mvc';
-import { ORM, ControllerMixinDatabase } from '@lionrockjs/central';
+import {ORM, ControllerMixinDatabase, Central} from '@lionrockjs/central';
 import ControllerMixinORMInput from './ORMInput.mjs';
 import ControllerMixinORMRead from './ORMRead.mjs';
 
@@ -14,6 +14,11 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
 
   static init(state) {
     if (!state.get(ControllerMixinORMWrite.DATABASE_KEY))state.set(ControllerMixinORMWrite.DATABASE_KEY, '');
+    state.set(this.ORM_OPTIONS, new Map([
+      ['orderBy', new Map([['id', 'ASC']])],
+      ['limit', Central.config.orm?.write_limit || 50],
+      ...state.get(this.ORM_OPTIONS) || [],
+    ]));
   }
 
   /**

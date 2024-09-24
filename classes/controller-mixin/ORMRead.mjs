@@ -1,4 +1,4 @@
-import { Controller, ControllerMixin, ORM, ControllerMixinDatabase } from '@lionrockjs/central';
+import { Controller, ControllerMixin, ORM, ControllerMixinDatabase, Central } from '@lionrockjs/central';
 
 export default class ControllerMixinORMRead extends ControllerMixin {
   static ORM_OPTIONS = 'orm_read_options';
@@ -27,7 +27,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
   static init(state) {
     state.set(this.ORM_OPTIONS, new Map([
       ['orderBy', new Map([['id', 'ASC']])],
-      ['limit', 50],
+      ['limit', Central.config.orm?.read_limit || 50],
       ...state.get(this.ORM_OPTIONS) || [],
     ]));
 
