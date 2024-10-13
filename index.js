@@ -1,6 +1,7 @@
-import url from "node:url";
-const dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
-export default {dirname}
+export default {
+  filename: import.meta.url,
+  configs: ['database', 'orm']
+}
 
 import ControllerMixinORMInput from './classes/controller-mixin/ORMInput.mjs';
 import ControllerMixinORMRead from './classes/controller-mixin/ORMRead.mjs';
