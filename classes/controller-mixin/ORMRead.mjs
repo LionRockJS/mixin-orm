@@ -82,22 +82,28 @@ export default class ControllerMixinORMRead extends ControllerMixin {
       ...state.get(this.LIST_FILTER)
     ];
 
-    const result = await ORM.readWith(model, criteria,{ database, ...options, offset, asArray:true });
-    const count = await ORM.countWith(model, criteria,{ database });
+    try{
+      const result = await ORM.readWith(model, criteria,{ database, ...options, offset, asArray:true });
+      const count = await ORM.countWith(model, criteria,{ database });
 
-    state.set(this.COUNT, count);
-    state.set(this.INSTANCES, result);
-    state.set(this.PAGINATE, {
-      current_offset: offset,
-      current_page: page + 1,
-      items: count,
-      page_param: model.tableName,
-      page_size: options.limit,
-      pages: Math.ceil(count / options.limit),
-      parts:[],
-      previous:{},
-      next:{},
-    })
+      state.set(this.COUNT, count);
+      state.set(this.INSTANCES, result);
+      state.set(this.PAGINATE, {
+        current_offset: offset,
+        current_page: page + 1,
+        items: count,
+        page_param: model.tableName,
+        page_size: options.limit,
+        pages: Math.ceil(count / options.limit),
+        parts:[],
+        previous:{},
+        next:{},
+      })
+    }catch(e){
+      console.error(e);
+      console.log(model);
+    }
+
   }
 
   static async action_read(state) {
