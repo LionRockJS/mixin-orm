@@ -97,7 +97,7 @@ const parseChildField = async (result, postData, Model, currentID = '?') => {
 };
 
 const parseAddSibling = async (result, postData, Model, currentID = '?') => {
-  const pattern = /^(\(\d+\))?\*(\w+)([\[(][\])])?$/;
+  const pattern = /^(\(\d+\))?~(\w+)([\[(][\])])?$/;
   await Promise.all([...postData.entries()].map(async (it) => {
     const key = it[0];
     const v = it[1];
@@ -107,7 +107,7 @@ const parseAddSibling = async (result, postData, Model, currentID = '?') => {
 
     const type = matches[2];
     const id = parseModelId(matches[1], currentID);
-    const prop = `*${matches[2]}`;
+    const prop = `~${matches[2]}`;
     const value = v.map(x => ((x === 'replace') ? x : parseInt(x, 10)));
 
     const Type = await ORM.import(type);

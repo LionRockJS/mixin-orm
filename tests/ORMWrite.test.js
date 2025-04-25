@@ -275,7 +275,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
       ])],
     ]));
 
-    expect(sql[0]).toBe('SELECT * FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[0]).toBe('SELECT id, created_at, updated_at, name, enabled FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 50 OFFSET 0');
     expect(queries[0].join()).toBe([2401110702890, 2401110710560].join());
 
     expect(sql.length).toBe(1);
@@ -289,7 +289,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
       ])],
     ]));
 
-    expect(sql[0]).toBe('SELECT * FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[0]).toBe('SELECT id, created_at, updated_at, name, enabled FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 50 OFFSET 0');
     expect(queries[0].join()).toBe([2401110702891, 2401110710563].join());
     expect(sql.length).toBe(3);
 
@@ -341,7 +341,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
       ])],
     ]), { id: 1 });
 
-    expect(sql[0]).toBe('SELECT * FROM persons WHERE id IN (?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[0]).toBe('SELECT id, created_at, updated_at, first_name, last_name, phone, email FROM persons WHERE id IN (?) ORDER BY id ASC LIMIT 50 OFFSET 0');
     expect(queries[0].join()).toBe([1].join());
     expect(sql[1]).toBe('UPDATE persons SET first_name = ?, last_name = ?, phone = ?, email = ? WHERE id = ?');
     expect(queries[1].join()).toBe(['Bob', 'Ban', null, 'alice@example.com', 1].join());
@@ -359,7 +359,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
 
     expect(sql[0]).toBe('INSERT OR FAIL INTO users (username, password, person_id, supervisor_id, role_id, id) VALUES (?, ?, ?, ?, ?, ?)');
 
-    expect(sql[1]).toBe('SELECT * FROM persons WHERE id IN (?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[1]).toBe('SELECT id, created_at, updated_at, first_name, last_name, phone, email FROM persons WHERE id IN (?) ORDER BY id ASC LIMIT 50 OFFSET 0');
     expect(queries[1].join()).toBe('10');
     expect(sql[2]).toBe('UPDATE persons SET first_name = ?, last_name = ?, phone = ?, email = ? WHERE id = ?');
     expect(queries[2].join()).toBe(['Alice', 'Chan', null, 'frank@example.com', 10].join());
@@ -427,7 +427,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
       ])],
     ]));
 
-    expect(sql[0]).toBe('SELECT * FROM children WHERE id IN (?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[0]).toBe('SELECT id, created_at, updated_at, name, parent_id FROM children WHERE id IN (?) ORDER BY id ASC LIMIT 50 OFFSET 0');
   });
 
   test('update value is boolean', async () => {
@@ -438,7 +438,7 @@ INSERT INTO persons (id, first_name, last_name, email) VALUES (10, 'Frank', 'Qui
       ])],
     ]));
 
-    expect(sql[0]).toBe('SELECT * FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 1000 OFFSET 0');
+    expect(sql[0]).toBe('SELECT id, created_at, updated_at, name, enabled FROM tests WHERE id IN (?, ?) ORDER BY id ASC LIMIT 50 OFFSET 0');
     expect(queries[0].join()).toBe([1, 2].join());
     expect(sql.length).toBe(3);
 
