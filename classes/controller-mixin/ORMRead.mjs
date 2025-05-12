@@ -102,6 +102,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     }catch(e){
       console.error(e);
       console.log(model);
+      console.log(options);
     }
 
   }
