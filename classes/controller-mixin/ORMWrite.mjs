@@ -82,7 +82,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
     await Promise.all(
       Array.from(mapNewInstance.entries()).map(async v => {
         const key = v[0];
-        if (!/^[*:]/.test(key)) return;
+        if (!/^[~:]/.test(key)) return;
 
         const ModelB = await ORM.import(key.slice(1));
         const models = v[1].filter(id => id !== 'replace').map(id => new ModelB(id, orm_options));
@@ -142,7 +142,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
             });
 
             MClass.belongsToMany.forEach(field => {
-              const k = `*${field}`;
+              const k = `~${field}`;
               const v = newValues.get(k);
               if (v === undefined || v === '') return;
               m[k] = v;
@@ -158,7 +158,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
               await Promise.all(
 
                 [...MClass.belongsToMany].map(async xx => {
-                  const k = `*${xx}`;
+                  const k = `~${xx}`;
                   if (m[k] === undefined) return;
                   if (!Array.isArray(m[k])) throw new Error(`${k} must be Array`);
 
