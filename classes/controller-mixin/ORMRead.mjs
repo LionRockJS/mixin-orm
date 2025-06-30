@@ -41,21 +41,16 @@ export default class ControllerMixinORMRead extends ControllerMixin {
 
   static verfiy_order_by(state){
     const orderBy = state.get(this.ORM_OPTIONS).get('orderBy');
-    [...orderBy.values()].forEach(it => {
-      const orderDirection = it.trim().toUpperCase();
-      if(orderDirection !== 'ASC' && orderDirection !== 'DESC'){
-        throw new Error('ORDER BY must be ASC or DESC, received:' + orderDirection);
-      }
-    });
-
     const Model = state.get(this.MODEL);
     if (!Model)return;
 
     const columns = [...Model.fields.keys()];
     [...orderBy.keys()].forEach(it => {
-      if(it === 'id' || it === 'created_at' || it === 'updated_at') return;
-      if(!columns.includes(it)){
-        throw new Error(`ORDER BY column ${it} not found in model ${Model.name}`);
+      const parts = it.split(':');
+
+      if(parts[0] === 'id' || parts[0] === 'created_at' || parts[0] === 'updated_at') return;
+      if(!columns.includes(parts[0])){
+        throw new Error(`ORDER BY column ${parts[0]} not found in model ${Model.name}`);
       }
     });
   }
@@ -83,8 +78,8 @@ export default class ControllerMixinORMRead extends ControllerMixin {
     ];
 
     try{
-      const result = await ORM.readWith(model, criteria,{ database, ...options, offset, asArray:true });
-      const count = await ORM.countWith(model, criteria,{ database });
+      const result = await ORM.readWith(model, criteria, { database, ...options, offset, asArray:true });
+      const count = await ORM.countWith(model, criteria, { database });
 
       state.set(this.COUNT, count);
       state.set(this.INSTANCES, result);
@@ -101,8 +96,8 @@ export default class ControllerMixinORMRead extends ControllerMixin {
       })
     }catch(e){
       console.error(e);
-      console.log(model);
-      console.log(options);
+      Central.log(model);
+      Central.log(options);
     }
 
   }
