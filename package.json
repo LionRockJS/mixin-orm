@@ -1,35 +1,33 @@
 {
   "type": "module",
   "name": "@lionrockjs/mixin-orm",
-  "version": "0.0.16",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.3",
+  "description": "LionRockJS ORM mixin",
+  "main": "classes/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
-    "test": "node --experimental-vm-modules ../../../node_modules/jest/bin/jest.js --coverage"
-  },
-  "jest": {
-    "verbose": true,
-    "transform": {},
-    "testMatch": [
-      "**/__tests__/**/*.[jt]s?(x)",
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "mjs"
-    ]
+    "build": "tsc",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LionRockJS/mixin-orm.git"
   },
+  "keywords": [
+    "LionRock",
+    "mixin",
+    "orm"
+  ],
   "author": "Kojin Nakana",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/LionRockJS/mixin-orm/issues"
   },
   "homepage": "https://github.com/LionRockJS/mixin-orm#readme",
-  "dependencies": {}
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5"
+  }
 }
