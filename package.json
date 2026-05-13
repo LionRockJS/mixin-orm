@@ -1,9 +1,9 @@
 {
   "type": "module",
   "name": "@lionrockjs/mixin-orm",
-  "version": "0.0.3",
+  "version": "2.0.0",
   "description": "LionRockJS ORM mixin",
-  "main": "classes/index.js",
+  "main": "dist/index.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "tsc",
