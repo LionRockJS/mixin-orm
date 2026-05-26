@@ -1,4 +1,4 @@
-import { Controller, ControllerMixin, ORM } from '@lionrockjs/central';
+import { ControllerMixin, ControllerState, ORM } from '@lionrockjs/central';
 import ControllerMixinORMRead from './ORMRead.mjs';
 const mapGetOrCreate = (map, key, defaultValue) => {
     const result = map.get(key);
@@ -137,7 +137,7 @@ export default class ORMInput extends ControllerMixin {
     static POST = '$_POST';
     static async action_update(state) {
         const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
-        const { id } = state.get(Controller.STATE_PARAMS);
+        const { id } = state.get(ControllerState.PARAMS);
         const $_POST = state.get(this.POST);
         const postData = new Map(Object.entries($_POST));
         // parse postData;

@@ -1,4 +1,4 @@
-import { Controller, ControllerMixin } from '@lionrockjs/mvc';
+import { ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import { ORM, ControllerMixinDatabase, Central } from '@lionrockjs/central';
 import ControllerMixinORMInput from './ORMInput.mjs';
 import ControllerMixinORMRead from './ORMRead.mjs';
@@ -17,7 +17,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         ]));
     }
     static async action_update(state) {
-        const { id } = state.get(Controller.STATE_PARAMS);
+        const { id } = state.get(ControllerState.PARAMS);
         const input = state.get(ControllerMixinORMInput.ORM_INPUT);
         const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
         const databaseKey = state.get(this.DATABASE_KEY) || state.get(ControllerMixinORMRead.DATABASE_KEY);

@@ -1,4 +1,4 @@
-import { Controller, ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import { ORM, ControllerMixinDatabase, Central } from '@lionrockjs/central';
 import ControllerMixinORMInput from './ORMInput.mjs';
 import ControllerMixinORMRead from './ORMRead.mjs';
@@ -19,7 +19,7 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
   }
 
   static async action_update(state: Map<string, any>) {
-    const { id } = state.get(Controller.STATE_PARAMS);
+    const { id } = state.get(ControllerState.PARAMS);
     const input = state.get(ControllerMixinORMInput.ORM_INPUT);
     const model = state.get(this.MODEL) ?? state.get(ControllerMixinORMRead.MODEL);
     const databaseKey = state.get(this.DATABASE_KEY) || state.get(ControllerMixinORMRead.DATABASE_KEY);
@@ -91,9 +91,9 @@ export default class ControllerMixinORMWrite extends ControllerMixin {
         if (x[1].size === 0) return;
 
         const MClass = await ORM.import(x[0]);
-        const ids = Array.from(x[1].keys());
+        const ids = Array.from(x[1].keys()) as (string | number)[];
 
-        const results = await ORM.readBy(MClass, 'id', ids, { ...orm_options, asArray: true });
+        const results = await ORM.readBy(MClass, 'id', ids, { ...orm_options, asArray: true }) as any[];
 
         await Promise.all(
           results.map(async (model: any) => {

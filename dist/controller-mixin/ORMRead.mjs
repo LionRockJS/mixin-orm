@@ -1,4 +1,4 @@
-import { Controller, ControllerMixin, ORM, ControllerMixinDatabase, Central } from '@lionrockjs/central';
+import { ControllerMixin, ControllerState, ORM, ControllerMixinDatabase, Central } from '@lionrockjs/central';
 export default class ControllerMixinORMRead extends ControllerMixin {
     static ORM_OPTIONS = 'orm_read_options';
     static MODEL = 'orm_model';
@@ -49,9 +49,9 @@ export default class ControllerMixinORMRead extends ControllerMixin {
         if (!model)
             return;
         this.verfiy_order_by(state);
-        const database = state.get(ControllerMixinDatabase.DATABASES)?.get(state.get(this.DATABASE_KEY)) ?? ORM.database;
+        const database = state.get(ControllerMixinDatabase.DATABASES)?.get(state.get(this.DATABASE_KEY));
         const options = Object.fromEntries(state.get(this.ORM_OPTIONS).entries());
-        const query = state.get(Controller.STATE_QUERY);
+        const query = state.get(ControllerState.QUERY);
         const page = parseInt(query.page ?? '1', 10) - 1;
         const offset = page * options.limit;
         const start = query.start ?? '1970-1-1';
@@ -89,7 +89,7 @@ export default class ControllerMixinORMRead extends ControllerMixin {
         if (!model)
             throw new Error('Controller Mixin ORM Read without model');
         this.verfiy_order_by(state);
-        const { id } = state.get(Controller.STATE_PARAMS);
+        const { id } = state.get(ControllerState.PARAMS);
         const database = state.get(ControllerMixinDatabase.DATABASES).get(state.get(this.DATABASE_KEY));
         state.set(this.COUNT, await ORM.countAll(model, { database }));
         state.set(this.INSTANCE, await ORM.factory(model, id, { database }));
